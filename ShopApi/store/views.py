@@ -172,12 +172,13 @@ class DetailTransactionView(generics.RetrieveAPIView):
 class OrderView(generics.ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-
+    # I need to see the sample data
     def post(self, request):
+        # You cannot be fetching 1000000 products
         products = Product.objects.all()
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
-
+            # Are you sure you have this data
             cart = serializer.validated_data['cart']
             cartItems = CartItem.objects.filter(cart=cart)
 
@@ -187,8 +188,9 @@ class OrderView(generics.ListCreateAPIView):
             for cartItem in cartItems:
 
                 if cartItem.product in products:
+                    # what is the difference between cart Item and Item here
                     item = Product.objects.get(pk=cartItem.product.pk)
-
+                    # what are you trying to explain here
                     if cartItem.quantity <= item.quantity:
                         cost = cost + cartItem.cost
                         item.quantity = item.quantity - cartItem.quantity
@@ -203,7 +205,7 @@ class OrderView(generics.ListCreateAPIView):
                     #     item.quantity = item.quantity - cartItem.quantity
                     #     product_is_valid = True
                     #     item.save()
-
+                # why are you deleting here
                 else:
                     cartItem.delete()
 
@@ -224,9 +226,10 @@ class OrderView(generics.ListCreateAPIView):
                     )
 
                     transaction.save()
+                    # why are you passing this value into the serializer
                 serializer.validated_data['transaction'] = transaction
                 serializer.save()
-
+                
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response({'Error': 'Order not Created'})
